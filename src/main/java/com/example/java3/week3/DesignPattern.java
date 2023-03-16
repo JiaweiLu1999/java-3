@@ -20,12 +20,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  *  Use case: we want one instance / object to be shared in jvm
@@ -337,6 +339,141 @@ class Day12AStrategy {
 
 /**
  *  adaptor
- *  decorator (static proxy)
- *  dynamic proxy
  */
+interface MyCompanyApi {
+    void print();
+    int get();
+}
+interface ThirdPartyApi {
+    void print();
+}
+
+class MyCompanyService {
+    public void process(MyCompanyApi myCompanyApi) {
+        myCompanyApi.print();
+    }
+}
+
+class MyCompanyAdaptor implements MyCompanyApi {
+    private ThirdPartyApi thirdPartyApi;
+
+    public MyCompanyAdaptor(ThirdPartyApi thirdPartyApi) {
+        this.thirdPartyApi = thirdPartyApi;
+    }
+
+    @Override
+    public void print() {
+        thirdPartyApi.print();
+    }
+
+    @Override
+    public int get() {
+        return -1;
+    }
+}
+
+class AdaptorTest {
+    public static void main(String[] args) {
+        ThirdPartyApi instance1 = () -> System.out.println("this is 3rd party");
+        MyCompanyApi instance2 = new MyCompanyAdaptor(instance1);
+        new MyCompanyService().process(instance2);
+    }
+}
+
+/**
+ *  decorator (static proxy)
+ */
+
+class Day13StudentService implements MyCompanyApi {
+    public void print() {
+        System.out.println("this is day13 student service");
+    }
+
+    public int get() {
+        return 1;
+    }
+}
+
+class Day13StudentServiceDecoratorImpl1 extends Day13StudentService {
+    @Override
+    public void print() {
+        System.out.println("before");
+        super.print();
+        System.out.println("after");
+    }
+}
+
+class Day13StudentServiceDecoratorImpl2 implements MyCompanyApi {
+    private MyCompanyApi myCompanyApi;
+
+    public Day13StudentServiceDecoratorImpl2(MyCompanyApi myCompanyApi) {
+        this.myCompanyApi = myCompanyApi;
+    }
+
+    @Override
+    public void print() {
+        System.out.println("before");
+        myCompanyApi.print();
+        System.out.println("after");
+    }
+
+    @Override
+    public int get() {
+        System.out.println("before");
+        int res = myCompanyApi.get();
+        System.out.println("after");
+        return res;
+    }
+}
+
+class Day13DecoratorTest {
+    public static void main(String[] args) {
+        Day13StudentService instance = null;
+        instance.print();
+    }
+}
+/**
+ * print
+ * "before"
+ * "this is day13 student service"
+ * "after"
+ */
+
+/**
+ *  dynamic proxy
+ *      java : interface proxy
+ *      cglib : class level proxy
+ *
+ *  book flight ticket -> agent -> UA
+ *  Day13StudentService -> invocation handler -> real instance logic
+ */
+class Day13StudentServiceInvocationHandler implements InvocationHandler {
+    private MyCompanyApi myCompanyApi;
+
+    public Day13StudentServiceInvocationHandler(MyCompanyApi myCompanyApi) {
+        this.myCompanyApi = myCompanyApi;
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        System.out.println("before");
+        Object res = method.invoke(myCompanyApi, args);
+        System.out.println(res);
+        System.out.println("after");
+        return res;
+    }
+}
+
+class Day13StudentServiceDynamicProxyTest {
+    public static void main(String[] args) {
+        Day13StudentService realInstance = new Day13StudentService();
+        MyCompanyApi proxy = (MyCompanyApi) Proxy.newProxyInstance(
+                Day13StudentServiceDynamicProxyTest.class.getClassLoader(),
+                new Class[]{MyCompanyApi.class},
+                new Day13StudentServiceInvocationHandler(realInstance)
+        );
+        proxy.print();
+        System.out.println();
+        proxy.get();
+    }
+}
