@@ -1,4 +1,4 @@
-Day 1 solution documentation
+Day 11 solution documentation
 @Jiawei Lu
 -------------------------------------------------------------------------------
 SongCacheImpl.java
