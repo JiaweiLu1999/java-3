@@ -15,7 +15,8 @@ public class AopTest {
                 new Class[]{StudentService.class},
                 new JdkAOPInvocationHandler(new StudentServiceImpl(), new StudentAspect())
         );
-        ss.print();
+        int a = ss.get();
+        System.out.println("return: " + a);
     }
 }
 
@@ -53,7 +54,6 @@ class StudentAspect {
         System.out.println("after around one");
         return res;
     }
-
 
 }
 

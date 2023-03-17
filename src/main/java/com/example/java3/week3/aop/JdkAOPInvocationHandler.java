@@ -33,6 +33,10 @@ public class JdkAOPInvocationHandler implements InvocationHandler {
                     methodInterceptor = new AfterMethodInterceptor(aspectObj, aspectMethod);
                 } else if(ano.annotationType() == Around.class) {
                     methodInterceptor = new AroundMethodInterceptor(aspectObj, aspectMethod);
+                } else if(ano.annotationType() == AfterReturn.class) {
+                    methodInterceptor = new AfterReturnMethodInterceptor(aspectObj, aspectMethod);
+                } else {
+                    methodInterceptor = new AfterThrowMethodInterceptor(aspectObj, aspectMethod);
                 }
                 interceptors.add(methodInterceptor);
             }

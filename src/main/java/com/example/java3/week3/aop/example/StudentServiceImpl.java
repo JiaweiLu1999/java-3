@@ -1,5 +1,9 @@
 package com.example.java3.week3.aop.example;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
 class StudentServiceImpl implements StudentService {
     @Override
     public void print() {
@@ -10,12 +14,12 @@ class StudentServiceImpl implements StudentService {
 
     @Override
     public int get() {
-        System.out.println("this is get");
-        return 0;
+        throw new RuntimeException();
     }
 
     @Override
     public void set() {
         System.out.println("this is set");
     }
+
 }
