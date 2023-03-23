@@ -165,6 +165,9 @@ package com.example.java3.week4;
  *      Tomorrow's homework
  *          1. create controller + service + repository + entity
  *          2. handle exception in controller + globally
- *          3. log info / error ...
+ *          3. log info / exception / global exception
  *          4. use response DTO / request DTO instead of entity
+ *      deadline : Monday 10am CDT
+ *
+ *      SQL developer / Database GUI
  */
