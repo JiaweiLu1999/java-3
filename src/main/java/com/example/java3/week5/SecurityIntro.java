@@ -48,10 +48,43 @@ package com.example.java3.week5;
  *                          generate symmetric key
  *                     -> symmetric key [data] ->
  *                     <- symmetric key [data] <-
+ *  4. SQL injection
+ *  5. Log injection (upgrade log4j version)
+ *  6. CSRF (session attack)
+ *           user
+ *            |
+ *          server
+ *  7. CORS
  *
+ *          domain1  -pre flight request>   domain2
+ *                   <-   info
  *
+ *                   - /xx + header:info
+ *  8. DDOS
+ *          a. block ip ranges / whitelist
+ *          b. scale up
+ *          c. shutdown services + display static pages
+ *  9. password : hash password
+ *  10. String / char[]
  *
- *    Tomorrow :
- *      1. Spring security
- *      2. Microservice introduction
+ *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+ *
+ *                                             save user info into security context(ThreadLocal)
+ *                                                            |
+ *                                                        jwt utility
+ *                                                           |
+ *                                                  retrieve header, get jwt token
+ *                                                          |
+ *   user <-> UsernamePasswordAuthenticationFilter <-> JWT filter <-> filter3 <-> spring mvc <-> controller (@PreAuthorize("hasAuthority('Admin')")
+ *                  |
+ *             get username password from post request
+ *                 |
+ *            attempt authenticate  ->  success -> trigger successful handler / controller(/login, post) -> generate jwt token -> return to user
+ *                |
+ *            DaoAuthenticationProvider
+ *               |
+ *        retrieve User from UserDetailsService interface
+ *              |
+ *         verify user info
+ *
  */
