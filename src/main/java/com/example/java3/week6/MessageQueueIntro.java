@@ -91,11 +91,105 @@ package com.example.java3.week6;
  *       T1P3 slave         T1P3 master         T1P3 slave
  *
  *        *        *        *        *        *        *        *        *        *        *        *
- *    Discuss message issues
- *      1. duplicate messages
- *      2. transaction
+ *   message queue duplicate message
+ *      1. idempotent service
+ *          put -> update table set name = Tom where id = xx and name = Jerry
+ *          post -> insert into table values (id, )
+ *      2. global cache / save id of processed messages
+ *        *        *        *        *        *        *        *        *        *        *        *
+ *   global transaction problem1 (message queue + database)
+ *         user
+ *          |
+ *         service1     -   message queue
+ *          |
+ *         DB
  *
- *      3pmCDT
+ *         service1
+ *         1. send msg to message queue
+ *         2. save data into DB
+ *
+ *          change data capture + out box pattern
+ *
+ *     solution  : CDC + outbox
+ *         user
+ *          |
+ *         service1
+ *          |
+ *         DB     -   CDC service  -  message queue   -   service2
+ *         1. service1
+ *              begin tx
+ *              insert user's data
+ *              insert message into outbox table
+ *              commit tx / rollback when any exception happens
+ *
+ *         2. CDC service monitoring outbox table
+ *              read message
+ *              send to message queue
+ *              delete message
+ *        *        *        *        *        *        *        *        *        *        *        *
+ *   global transaction problem2 (database  + database)
+ *
+ *                  service
+ *                 /        \
+ *               db1        db2
+ *          1. insert into db1
+ *          2. insert into db2
+ *
+ *          begin db1 tx
+ *          insert into db1
+ *          begin db2 tx
+ *          insert into db2
+ *          commit db1
+ *          commit db2
  *
  *
+ *      solution 1 : 2pc / two phase commit
+ *
+ *               request
+ *                  |
+ *              coordinator
+ *             /            \
+ *         db1              db2
+ *
+ *           step1: send query to database,
+ *                  execute the query
+ *                  save everything into local log(disk)
+ *                  need ok response from db1, db2
+ *           step2: send commit commands to both databases
+ *      solution 2 : 3pc / three phase commit
+ *      solution 3 : SAGA pattern
+ *
+ *           flight service  <->   message queue  <->   hotel service <-> message queue  <->  car rental service
+ *                 |                                    |                                       |
+ *               DB                                     DB                                      DB
+ *
+ *        book flight in flight service -> if fail -> rollback , give user error response
+ *                  | success commit tx
+ *              message queue
+ *                  |
+ *        book hotel in hotel service -> if fail -> rollback hotel db, -> send message to message queue -> commit flight cancel tx
+ *                 | success commit tx
+ *             message queue
+ *                 |
+ *        book  car in car service -> if fail -> rollback car db -> send message to message queue -> commit hotel cancel tx
+ *                 | success commit tx
+ *              message queue
+ *                |
+ *           notification / email
+ *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *
+ *    BASE
+ *      basic availability
+ *      soft stage
+ *      eventually consistency
+ *   *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *
+ *   dead letter queue -> support team raise a ticket -> developers
+ *
+ *   *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *    *
+ *   tomorrow morning
+ *       1. Testing , unit test, junit , mockito
+ *       2. branch strategy + environment
+ *       3. CI/CD pipeline
+ *       4. daily work + agile scrum
+ *       5. code review
+ *       6. production support
  */
