@@ -20,6 +20,9 @@ public class Employee {
     private Date createdTime;
     private boolean active;
 
+    public Employee(int id) {
+        this.id = id;
+    }
 
     @Override
     public boolean equals(Object o) {
