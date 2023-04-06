@@ -94,13 +94,6 @@ class MyArrayList {
         //TODO
         return 0;
     }
-
-    public static void main(String[] args) {
-        MyArrayList list = new MyArrayList();
-        list.add("a");
-        list.add(5);
-        list.add(false);
-    }
 }
 
 
@@ -273,7 +266,7 @@ class MyArrayLis4 {
     private Object[] arr;
 
     public Object get(int idx) {
-        if(idx - 1 < 0 || idx - 1 >= arr.length) {
+        if (idx - 1 < 0 || idx - 1 >= arr.length) {
             return null;
         } else {
             return arr[idx];
@@ -291,8 +284,8 @@ class MyArrayLis4 {
 
     //not following arraylist implementation
     public void add(Object obj) {
-        for(int i = 0; i < arr.length; i++){
-            if (arr[i] == null){
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == null) {
                 arr[i] = obj;
                 return;
             }
@@ -300,7 +293,7 @@ class MyArrayLis4 {
             int idx = arr.length;
 
             Object[] newArr = new Object[arr.length * 2];
-            for(int j=0; j<arr.length;j++){
+            for (int j = 0; j < arr.length; j++) {
                 newArr[i] = arr[j];
             }
             newArr[idx] = obj;
