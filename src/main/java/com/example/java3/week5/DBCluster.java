@@ -71,6 +71,64 @@ package com.example.java3.week5;
  *
  *        replica = 3
  *
+ *  Cassandra (AP)
+ *
+ *                      N1(0) id=3
+ *
+ *          N6(60k)              N2 (10k)  id=1,3
+ *
+ *          N5(50k)              N3 (20k)  id=1,3
+ *
+ *                  N4(40k) id=1
+ *
+ *
+ *   FETCH id = 1   -> N5 ->    N2
+ *                              N3
+ *                              N4
+ *    Write Consistency = 1
+ *    Read  Consistency = 2
+ *      (check network speed,
+ *       fetch data from one node,
+ *       fetch hash value from another node,
+ *       compare data
+ *       if data not same => read repair on these two nodes
+ *       return mode recent data from these two nodes)
+ *    Replica Factor = 3
+ *
+ *    W + R > RF ?
+ *
+ *
+ *
+ *    cassandra node
+ *
+ *       write  ->   mem table -> dump into -> SSTable / Sorted String Table(immutable)
+ *                  |
+ *             commit log
+ *
+ *
+ *                    SSTable4
+ *                  /           \
+ *              SSTable1        SSTable2         SSTable3
+ *
+ *      update = upsert = update if primary key exist / insert row
+ *
+ *      update ..where pk = xx (upsert)  = update if primary key exist / insert row
+ *      update ..where pk = xx if exist (update)
+ *
+ *
+ *      read  -> mem table
+ *            -> blooming filter
+ *            -> search sst -> index
+ *            -> merge result
+ *
+ *
+ *     ??? blooming filter
+ *     id = 1
+ *     SST1 hashFunc1()[][][][x][][][][][][][][]
+ *          hashFunc2()[][][][][][][][][][x][][]
+ *          hashFunc3()[][x][][][][][][][][][][]
+ *
+ *     SST [][][][][][][][][][][][]
  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
  *  Sharding  -  index issues
  *      1. split data into even / odd db
@@ -141,6 +199,8 @@ package com.example.java3.week5;
  *   next Monday + Tuesday
  *       1. code review
  *       2. Cassandra
+ *
+ *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
  *       3. 2PC commit
  *       4. Message queue
  *       5. CDC + outbox pattern
